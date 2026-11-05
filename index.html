@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Organisation Chat Bot — Команды</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+    }
+
+    body {
+      background: #0b0e14;
+      color: #e5e9f0;
+      line-height: 1.5;
+      padding: 2rem 1rem;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    /* Заголовок */
+    .header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 2rem;
+      gap: 1rem;
+    }
+
+    .logo h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #7aa2f7, #bb9af7);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: -0.5px;
+    }
+
+    .logo p {
+      color: #9aa5ce;
+      font-size: 0.9rem;
+      margin-top: 0.2rem;
+    }
+
+    .btn-nav {
+      display: inline-block;
+      background: #1e2433;
+      color: #c0caf5;
+      padding: 0.7rem 1.5rem;
+      border-radius: 40px;
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 0.95rem;
+      border: 1px solid #2f3b54;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+
+    .btn-nav:hover {
+      background: #2a3347;
+      border-color: #7aa2f7;
+      color: #fff;
+      transform: translateY(-2px);
+    }
+
+    /* Панель разделов */
+    .tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 2rem;
+      border-bottom: 1px solid #1f2636;
+      padding-bottom: 1rem;
+    }
+
+    .tab-btn {
+      background: transparent;
+      border: 1px solid #2a3347;
+      color: #9aa5ce;
+      padding: 0.6rem 1.4rem;
+      border-radius: 30px;
+      cursor: pointer;
+      font-weight: 500;
+      font-size: 0.9rem;
+      transition: 0.2s;
+    }
+
+    .tab-btn:hover {
+      background: #1e2433;
+      color: #e5e9f0;
+      border-color: #3b4b6e;
+    }
+
+    .tab-btn.active {
+      background: #2a3347;
+      color: #fff;
+      border-color: #7aa2f7;
+      box-shadow: 0 0 0 1px #7aa2f7 inset;
+    }
+
+    /* Секции */
+    .section {
+      display: none;
+      animation: fade 0.2s ease;
+    }
+
+    .section.active {
+      display: block;
+    }
+
+    @keyframes fade {
+      from { opacity: 0.5; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .category-title {
+      font-size: 1.3rem;
+      font-weight: 600;
+      margin: 2rem 0 1rem;
+      color: #bb9af7;
+      letter-spacing: -0.3px;
+    }
+
+    .category-title:first-of-type {
+      margin-top: 0;
+    }
+
+    /* Сетка команд */
+    .commands-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 0.75rem;
+    }
+
+    .cmd-card {
+      background: #131a26;
+      border: 1px solid #1f2a3f;
+      border-radius: 12px;
+      padding: 0.9rem 1.2rem;
+      transition: 0.15s;
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+    }
+
+    .cmd-card:hover {
+      border-color: #3b4b6e;
+      background: #18202e;
+      transform: translateY(-1px);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+    }
+
+    .cmd-name {
+      font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: #7aa2f7;
+      word-break: break-word;
+    }
+
+    .cmd-desc {
+      font-size: 0.85rem;
+      color: #9aa5ce;
+      line-height: 1.4;
+    }
+
+    .rank-badge {
+      display: inline-block;
+      background: #1f2a3f;
+      color: #bb9af7;
+      font-size: 0.65rem;
+      font-weight: 700;
+      padding: 0.15rem 0.6rem;
+      border-radius: 20px;
+      letter-spacing: 0.3px;
+      margin-bottom: 0.3rem;
+      text-transform: uppercase;
+      width: fit-content;
+    }
+
+    /* Карточка ранга (для заголовков категорий) */
+    .rank-header {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      margin: 2rem 0 0.8rem;
+    }
+
+    .rank-header .rank-badge {
+      margin: 0;
+      font-size: 0.8rem;
+      padding: 0.25rem 0.9rem;
+    }
+
+    .rank-header h3 {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #e5e9f0;
+    }
+
+    /* Адаптив */
+    @media (max-width: 600px) {
+      body { padding: 1.2rem 0.8rem; }
+      .header { flex-direction: column; align-items: flex-start; }
+      .logo h1 { font-size: 1.6rem; }
+      .commands-grid { grid-template-columns: 1fr; }
+      .tab-btn { padding: 0.5rem 1rem; font-size: 0.8rem; }
+      .rank-header { flex-wrap: wrap; }
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <!-- Шапка -->
+  <header class="header">
+    <div class="logo">
+      <h1>Organisation Chat Bot</h1>
+      <p>Полный список команд бота · OCB</p>
+    </div>
+    <a href="https://organizationbrchat-sys.github.io/organization/#/" target="_blank" rel="noopener" class="btn-nav">
+      🏢 Навигация по беседам организаций →
+    </a>
+  </header>
+
+  <!-- Панель вкладок -->
+  <nav class="tabs">
+    <button class="tab-btn active" data-tab="all">Все команды</button>
+    <button class="tab-btn" data-tab="basic">Основные</button>
+    <button class="tab-btn" data-tab="games">Игровые</button>
+    <button class="tab-btn" data-tab="moderator">Модераторские</button>
+    <button class="tab-btn" data-tab="manage">Управление беседой</button>
+  </nav>
+
+  <!-- ========== РАЗДЕЛ: ВСЕ КОМАНДЫ ========== -->
+  <section id="tab-all" class="section active">
+    <!-- 0 — Участник -->
+    <div class="rank-header">
+      <span class="rank-badge">0 — Участник</span>
+      <h3>Базовые команды</h3>
+    </div>
+    <div class="commands-grid">
+      <div class="cmd-card"><span class="cmd-name">/помощь</span><span class="cmd-desc">справка</span></div>
+      <div class="cmd-card"><span class="cmd-name">/меню</span><span class="cmd-desc">разделы по рангу</span></div>
+      <div class="cmd-card"><span class="cmd-name">/старт</span><span class="cmd-desc">онбординг</span></div>
+      <div class="cmd-card"><span class="cmd-name">/чек</span><span class="cmd-desc">карточка игрока</span></div>
+      <div class="cmd-card"><span class="cmd-name">/профиль · /я</span><span class="cmd-desc">профиль</span></div>
+      <div class="cmd-card"><span class="cmd-name">/стата</span><span class="cmd-desc">сообщения и XP</span></div>
+      <div class="cmd-card"><span class="cmd-name">/ид</span><span class="cmd-desc">числовой ID</span></div>
+      <div class="cmd-card"><span class="cmd-name">/дейли</span><span class="cmd-desc">ежедневный XP</span></div>
+      <div class="cmd-card"><span class="cmd-name">/топ</span><span class="cmd-desc">топ дня</span></div>
+      <div class="cmd-card"><span class="cmd-name">/топнеделя</span><span class="cmd-desc">топ недели</span></div>
+      <div class="cmd-card"><span class="cmd-name">/топхп</span><span class="cmd-desc">топ по XP</span></div>
+      <div class="cmd-card"><span class="cmd-name">/топвсе</span><span class="cmd-desc">общий топ</span></div>
+      <div class="cmd-card"><span class="cmd-name">/магазин</span><span class="cmd-desc">косметика за XP</span></div>
+      <div class="cmd-card"><span class="cmd-name">/игры</span><span class="cmd-desc">игровое меню</span></div>
+      <div class="cmd-card"><span class="cmd-name">/угадай</span><span class="cmd-desc">игра 1–15</span></div>
+      <div class="cmd-card"><span class="cmd-name">/рулетка</span><span class="cmd-desc">ставка XP</span></div>
+      <div class="cmd-card"><span class="cmd-name">/дуэль</span><span class="cmd-desc">дуэль на XP</span></div>
+      <div class="cmd-card"><span class="cmd-name">/перевод</span><span class="cmd-desc">перевод XP</span></div>
+      <div class="cmd-card"><span class="cmd-name">/пет</span><span class="cmd-desc">меню питомца</span></div>
+      <div class="cmd-card"><span class="cmd-name">/пет магазин</span><span class="cmd-desc">купить питомца</span></div>
+      <div class="cmd-card"><span class="cmd-name">/покормить</span><span class="cmd-desc">покормить питомца</span></div>
+      <div class="cmd-card"><span class="cmd-name">/погулять</span><span class="cmd-desc">прогулка</span></div>
+      <div class="cmd-card"><span class="cmd-name">/поиграть</span><span class="cmd-desc">поиграть с питомцем</span></div>
+      <div class="cmd-card"><span class="cmd-name">/тост</span><span class="cmd-desc">тост (пивной кот)</span></div>
+      <div class="cmd-card"><span class="cmd-name">/петобраз</span><span class="cmd-desc">образ питомца</span></div>
+      <div class="cmd-card"><span class="cmd-name">/ошейник · /шапка · /аура · /след · /фон</span><span class="cmd-desc">аксессуары</span></div>
+      <div class="cmd-card"><span class="cmd-name">/стопка · /чекин · /похмелка</span><span class="cmd-desc">Чекушность</span></div>
+      <div class="cmd-card"><span class="cmd-name">/пет показать</span><span class="cmd-desc">карточка питомца</span></div>
+      <div class="cmd-card"><span class="cmd-name">/репорт</span><span class="cmd-desc">жалоба</span></div>
+      <div class="cmd-card"><span class="cmd-name">/мойрепорт</span><span class="cmd-desc">свои жалобы</span></div>
+      <div class="cmd-card"><span class="cmd-name">/ник</span><span class="cmd-desc">ник в беседе</span></div>
+      <div class="cmd-card"><span class="cmd-name">/гник</span><span class="cmd-desc">ник игрока</span></div>
+      <div class="cmd-card"><span class="cmd-name">/правила</span><span class="cmd-desc">правила</span></div>
+      <div class="cmd-card"><span class="cmd-name">/онлайн</span><span class="cmd-desc">кто в сети</span></div>
+      <div class="cmd-card"><span class="cmd-name">/бот</span><span class="cmd-desc">статус бота</span></div>
+      <div class="cmd-card"><span class="cmd-name">/состав</span><span class="cmd-desc">состав рангов</span></div>
+      <div class="cmd-card"><span class="cmd-name">/иерархия</span><span class="cmd-desc">уровни рангов</span></div>
+    </div>
+
+    <!-- 1 — Стажёр -->
+    <div class="rank-header">
+      <span class="rank-badge">1 — Стажёр</span>
+      <h3>Модерация (базовая)</h3>
+    </div>
+    <div class="commands-grid">
+      <div class="cmd-card"><span class="cmd-name">/пред · /варн</span><span class="cmd-desc">предупреждение</span></div>
+      <div class="cmd-card"><span class="cmd-name">/мут</span><span class="cmd-desc">мут</span></div>
+      <div class="cmd-card"><span class="cmd-name">/размут</span><span class="cmd-desc">снять мут</span></div>
+      <div class="cmd-card"><span class="cmd-name">/причины</span><span class="cmd-desc">шаблоны причин</span></div>
+      <div class="cmd-card"><span class="cmd-name">/варны</span><span class="cmd-desc">список варнов</span></div>
+      <div class="cmd-card"><span class="cmd-name">/история</span><span class="cmd-desc">история наказаний</span></div>
+      <div class="cmd-card"><span class="cmd-name">/чекбан</span><span class="cmd-desc">проверка банов</span></div>
+      <div class="cmd-card"><span class="cmd-name">/банлист</span><span class="cmd-desc">список банов</span></div>
+      <div class="cmd-card"><span class="cmd-name">/мутлист</span><span class="cmd-desc">список мутов</span></div>
+      <div class="cmd-card"><span class="cmd-name">/модстата</span><span class="cmd-desc">статистика модерации</span></div>
+      <div class="cmd-card"><span class="cmd-name">/репорты</span><span class="cmd-desc">список репортов</span></div>
+      <div class="cmd-card"><span class="cmd-name">/репответ</span><span class="cmd-desc">ответ на репорт</span></div>
+      <div class="cmd-card"><span class="cmd-name">/репзакрыть</span><span class="cmd-desc">закрыть репорт</span></div>
+    </div>
+
+    <!-- 2 — Модератор -->
+    <div class="rank-header">
+      <span class="rank-badge">2 — Модератор</span>
+      <h3>Модерация (расширенная)</h3>
+    </div>
+    <div class="commands-grid">
+      <div class="cmd-card"><span class="cmd-name">/кик</span><span class="cmd-desc">кик</span></div>
+      <div class="cmd-card"><span class="cmd-name">/бан</span><span class="cmd-desc">бан</span></div>
+      <div class="cmd-card"><span class="cmd-name">/перм</span><span class="cmd-desc">перманентный бан</span></div>
+      <div class="cmd-card"><span class="cmd-name">/сбан</span><span class="cmd-desc">серверный бан</span></div>
+      <div class="cmd-card"><span class="cmd-name">/скик</span><span class="cmd-desc">серверный кик</span></div>
+      <div class="cmd-card"><span class="cmd-name">/спред</span><span class="cmd-desc">снять варн</span></div>
+      <div class="cmd-card"><span class="cmd-name">/ник+</span><span class="cmd-desc">выдать ник</span></div>
+      <div class="cmd-card"><span class="cmd-name">/рник</span><span class="cmd-desc">снять ник</span></div>
+      <div class="cmd-card"><span class="cmd-name">/абан</span><span class="cmd-desc">снять ранги</span></div>
+      <div class="cmd-card"><span class="cmd-name">/ники</span><span class="cmd-desc">список ников</span></div>
+      <div class="cmd-card"><span class="cmd-name">/безники</span><span class="cmd-desc">без ников</span></div>
+    </div>
+
+    <!-- 3 — Старший модератор -->
+    <div class="rank-header">
+      <span class="rank-badge">3 — Старший модератор</span>
+      <h3>Управление сообщениями и ролями</h3>
+    </div>
+    <div class="commands-grid">
+      <div class="cmd-card"><span class="cmd-name">/разбан</span><span class="cmd-desc">разбан в беседе</span></div>
+      <div class="cmd-card"><span class="cmd-name">/сразбан</span><span class="cmd-desc">серверный разбан</span></div>
+      <div class="cmd-card"><span class="cmd-name">/clear · /mclear</span><span class="cmd-desc">очистка сообщений</span></div>
+      <div class="cmd-card"><span class="cmd-name">/очистка</span><span class="cmd-desc">удалить сообщения бота</span></div>
+      <div class="cmd-card"><span class="cmd-name">/закреп</span><span class="cmd-desc">закрепить сообщение</span></div>
+      <div class="cmd-card"><span class="cmd-name">/правила+</span><span class="cmd-desc">установить правила</span></div>
+      <div class="cmd-card"><span class="cmd-name">/правила-</span><span class="cmd-desc">сбросить правила</span></div>
+      <div class="cmd-card"><span class="cmd-name">/роль+</span><span class="cmd-desc">выдать роль</span></div>
+      <div class="cmd-card"><span class="cmd-name">/роль-</span><span class="cmd-desc">снять роль</span></div>
+      <div class="cmd-card"><span class="cmd-name">/роли</span><span class="cmd-desc">список ролей</span></div>
+      <div class="cmd-card"><span class="cmd-name">/рольинфо</span><span class="cmd-desc">инфо о роли</span></div>
+    </div>
+
+    <!-- 4 — Администратор -->
+    <div class="rank-header">
+      <span class="rank-badge">4 — Администратор</span>
+      <h3>Ранги и whitelist</h3>
+    </div>
+    <div class="commands-grid">
+      <div class="cmd-card"><span class="cmd-name">/ранг+</span><span class="cmd-desc">выдать серверный ранг</span></div>
+      <div class="cmd-card"><span class="cmd-name">/ранг-</span><span class="cmd-desc">снять серверный ранг</span></div>
+      <div class="cmd-card"><span class="cmd-name">/лок+</span><span class="cmd-desc">выдать локальный ранг</span></div>
+      <div class="cmd-card"><span class="cmd-name">/лок-</span><span class="cmd-desc">снять локальный ранг</span></div>
+      <div class="cmd-card"><span class="cmd-name">/вайтлист</span><span class="cmd-desc">список whitelist</span></div>
+      <div class="cmd-card"><span class="cmd-name">/вайтлист+</span><span class="cmd-desc">добавить в whitelist</span></div>
+      <div class="cmd-card"><span class="cmd-name">/вайтлист-</span><span class="cmd-desc">убрать из whitelist</span></div>
+    </div>
+
+    <!-- 5 — Старший администратор -->
+    <div class="rank-header">
+      <span class="rank-badge">5 — Старший администратор</span>
+      <h3>Объявления и настройки</h3>
+    </div>
+    <div class="commands-grid">
+      <div class="cmd-card"><span class="cmd-name">/объ</span><span class="cmd-desc">объявление в беседу</span></div>
+      <div class="cmd-card"><span class="cmd-name">/собы</span><span class="cmd-desc">объявление на сервер</span></div>
+      <div class="cmd-card"><span class="cmd-name">/репортканал</span><span class="cmd-desc">назначить канал репортов</span></div>
+      <div class="cmd-card"><span class="cmd-name">/репортканал-</span><span class="cmd-desc">снять канал репортов</span></div>
+      <div class="cmd-card"><span class="cmd-name">/логканал · /лог</span><span class="cmd-desc">канал логов</span></div>
+      <div class="cmd-card"><span class="cmd-name">/рольнастр</span><span class="cmd-desc">настройки роли</span></div>
+      <div class="cmd-card"><span class="cmd-name">/метка</span><span class="cmd-desc">метка беседы</span></div>
+      <div class="cmd-card"><span class="cmd-name">/настройки</span><span class="cmd-desc">настройки беседы</span></div>
+      <div class="cmd-card"><span class="cmd-name">/массувед</span><span class="cmd-desc">массувед в беседу</span></div>
+      <div class="cmd-card"><span class="cmd-name">/смассувед</span><span class="cmd-desc">массувед на сервер</span></div>
+    </div>
+
+    <!-- 6–7 — Руководство -->
+    <div class="rank-header">
+      <span class="rank-badge">6–7 — Руководство</span>
+      <h3>Глобальное управление</h3>
+    </div>
+    <div class="commands-grid">
+      <div class="cmd-card"><span class="cmd-name">/ккнопка</span><span class="cmd-desc">кнопка чата</span></div>
+      <div class="cmd-card"><span class="cmd-name">/ккнопка выкл</span><span class="cmd-desc">выключить кнопку</span></div>
+      <div class="cmd-card"><span class="cmd-name">/тишина</span><span class="cmd-desc">режим тишины</span></div>
+      <div class="cmd-card"><span class="cmd-name">/тишина выкл</span><span class="cmd-desc">снять тишину</span></div>
+      <div class="cmd-card"><span class="cmd-name">/привязать</span><span class="cmd-desc">привязать беседу к серверу</span></div>
+      <div class="cmd-card"><span class="cmd-name">/отвязать</span><span class="cmd-desc">отвязать беседу</span></div>
+      <div class="cmd-card"><span class="cmd-name">/сервера</span><span class="cmd-desc">список серверов</span></div>
+      <div class="cmd-card"><span class="cmd-name">/беседы</span><span class="cmd-desc">список бесед</span></div>
+      <div class="cmd-card"><span class="cmd-name">/гбан</span><span class="cmd-desc">глобальный бан (7+)</span></div>
+      <div class="cmd-card"><span class="cmd-name">/гразбан</span><span class="cmd-desc">снять глобальный бан (7+)</span></div>
+    </div>
+  </section>
+
+  <!-- ========== РАЗДЕЛ: ОСНОВНЫЕ ========== -->
+  <section id="tab-basic" class="section">
+    <div class="rank-header"><span class="rank-badge">0 — Участник</span><h3>Основные команды</h3></div>
+    <div class="commands-grid">
+      <div class="cmd-card"><span class="cmd-name">/помощь</span><span class="cmd-desc">справка</span></div>
+      <div class="cmd-card"><span class="cmd-name">/меню</span><span class="cmd-desc">разделы по рангу</span></div>
+      <div class="cmd-card"><span class="cmd-name">/старт</span><span class="cmd-desc">онбординг</span></div>
+      <div class="cmd-card"><span class="cmd-name">/чек</span><span class="cmd-desc">карточка игрока</span></div>
+      <div class="cmd-card"><span class="cmd-name">/профиль · /я</span><span class="cmd-desc">профиль</span></div>
+      <div class="cmd-card"><span class="cmd-name">/стата</span><span class="cmd-desc">сообщения и XP</span></div>
+      <div class="cmd-card"><span class="cmd-name">/ид</span><span class="cmd-desc">числовой ID</span></div>
+      <div class="cmd-card"><span class="cmd-name">/дейли</span><span class="cmd-desc">ежедневный XP</span></div>
+      <div class="cmd-card"><span class="cmd-name">/топ</span><span class="cmd-desc">топ дня</span></div>
+      <div class="cmd-card"><span class="cmd-name">/топнеделя</span><span class="cmd-desc">топ недели</span></div>
+      <div class="cmd-card"><span class="cmd-name">/топхп</span><span class="cmd-desc">топ по XP</span></div>
+      <div class="cmd-card"><span class="cmd-name">/топвсе</span><span class="cmd-desc">общий топ</span></div>
+      <div class="cmd-card"><span class="cmd-name">/магазин</span><span class="cmd-desc">косметика за XP</span></div>
+      <div class="cmd-card"><span class="cmd-name">/репорт</span><span class="cmd-desc">жалоба</span></div>
+      <div class="cmd-card"><span class="cmd-name">/мойрепорт</span><span class="cmd-desc">свои жалобы</span></div>
+      <div class="cmd-card"><span class="cmd-name">/ник</span><span class="cmd-desc">ник в беседе</span></div>
+      <div class="cmd-card"><span class="cmd-name">/гник</span><span class="cmd-desc">ник игрока</span></div>
+      <div class="cmd-card"><span class="cmd-name">/правила</span><span class="cmd-desc">правила</span></div>
+      <div class="cmd-card"><span class="cmd-name">/онлайн</span><span class="cmd-desc">кто в сети</span></div>
+      <div class="cmd-card"><span class="cmd-name">/бот</span><span class="cmd-desc">статус бота</span></div>
+      <div class="cmd-card"><span class="cmd-name">/состав</span><span class="cmd-desc">состав рангов</span></div>
+      <div class="cmd-card"><span class="cmd-name">/иерархия</span><span class="cmd-desc">уровни рангов</span></div>
+    </div>
+  </section>
+
+  <!-- ========== РАЗДЕЛ: ИГРОВЫЕ ========== -->
+  <section id="tab-games" class="section">
+    <div class="rank-header"><span class="rank-badge">0 — Участник</span><h3>Игровые команды и питомец</h3></div>
+    <div class="commands-grid">
+      <div class="cmd-card"><span class="cmd-name">/игры</span><span class="cmd-desc">игровое меню</span></div>
+      <div class="cmd-card"><span class="cmd-name">/угадай</span><span class="cmd-desc">игра 1–15</span></div>
+      <div class="cmd-card"><span class="cmd-name">/рулетка</span><span class="cmd-desc">ставка XP</span></div>
+      <div class="cmd-card"><span class="cmd-name">/дуэль</span><span class="cmd-desc">дуэль на XP</span></div>
+      <div class="cmd-card"><span class="cmd-name">/перевод</span><span class="cmd-desc">перевод XP</span></div>
+      <div class="cmd-card"><span class="cmd-name">/пет</span><span class="cmd-desc">меню питомца</span></div>
+      <div class="cmd-card"><span class="cmd-name">/пет магазин</span><span class="cmd-desc">купить питомца</span></div>
+      <div class="cmd-card"><span class="cmd-name">/покормить</span><span class="cmd-desc">покормить питомца</span></div>
+      <div class="cmd-card"><span class="cmd-name">/погулять</span><span class="cmd-desc">прогулка</span></div>
+      <div class="cmd-card"><span class="cmd-name">/поиграть</span><span class="cmd-desc">поиграть с питомцем</span></div>
+      <div class="cmd-card"><span class="cmd-name">/тост</span><span class="cmd-desc">тост (пивной кот)</span></div>
+      <div class="cmd-card"><span class="cmd-name">/петобраз</span><span class="cmd-desc">образ питомца</span></div>
+      <div class="cmd-card"><span class="cmd-name">/ошейник · /шапка · /аура · /след · /фон</span><span class="cmd-desc">аксессуары</span></div>
+      <div class="cmd-card"><span class="cmd-name">/стопка · /чекин · /похмелка</span><span class="cmd-desc">Чекушность</span></div>
+      <div class="cmd-card"><span class="cmd-name">/пет показать</span><span class="cmd-desc">карточка питомца</span></div>
+    </div>
+  </section>
+
+  <!-- ========== РАЗДЕЛ: МОДЕРАТОРСКИЕ ========== -->
+  <section id="tab-moderator" class="section">
+    <div class="rank-header"><span class="rank-badge">1 — Стажёр</span><h3>Базовые наказания</h3></div>
+    <div class="commands-grid">
+      <div class="cmd-card"><span class="cmd-name">/пред · /варн</span><span class="cmd-desc">предупреждение</span></div>
+      <div class="cmd-card"><span class="cmd-name">/мут</span><span class="cmd-desc">мут</span></div>
+      <div class="cmd-card"><span class="cmd-name">/размут</span><span class="cmd-desc">снять мут</span></div>
+      <div class="cmd-card"><span class="cmd-name">/причины</span><span class="cmd-desc">шаблоны причин</span></div>
+      <div class="cmd-card"><span class="cmd-name">/варны</span><span class="cmd-desc">список варнов</span></div>
+      <div class="cmd-card"><span class="cmd-name">/история</span><span class="cmd-desc">история наказаний</span></div>
+      <div class="cmd-card"><span class="cmd-name">/чекбан</span><span class="cmd-desc">проверка банов</span></div>
+      <div class="cmd-card"><span class="cmd-name">/банлист</span><span class="cmd-desc">список банов</span></div>
+      <div class="cmd-card"><span class="cmd-name">/мутлист</span><span class="cmd-desc">список мутов</span></div>
+      <div class="cmd-card"><span class="cmd-name">/модстата</span><span class="cmd-desc">статистика модерации</span></div>
+      <div class="cmd-card"><span class="cmd-name">/репорты</span><span class="cmd-desc">список репортов</span></div>
+      <div class="cmd-card"><span class="cmd-name">/репответ</span><span class="cmd-desc">ответ на репорт</span></div>
+      <div class="cmd-card"><span class="cmd-name">/репзакрыть</span><span class="cmd-desc">закрыть репорт</span></div>
+    </div>
+
+    <div class="rank-header"><span class="rank-badge">2 — Модератор</span><h3>Кики и баны</h3></div>
+    <div class="commands-grid">
+      <div class="cmd-card"><span class="cmd-name">/кик</span><span class="cmd-desc">кик</span></div>
+      <div class="cmd-card"><span class="cmd-name">/бан</span><span class="cmd-desc">бан</span></div>
+      <div class="cmd-card"><span class="cmd-name">/перм</span><span class="cmd-desc">перманентный бан</span></div>
+      <div class="cmd-card"><span class="cmd-name">/сбан</span><span class="cmd-desc">серверный бан</span></div>
+      <div class="cmd-card"><span class="cmd-name">/скик</span><span class="cmd-desc">серверный кик</span></div>
+      <div class="cmd-card"><span class="cmd-name">/спред</span><span class="cmd-desc">снять варн</span></div>
+      <div class="cmd-card"><span class="cmd-name">/ник+</span><span class="cmd-desc">выдать ник</span></div>
+      <div class="cmd-card"><span class="cmd-name">/рник</span><span class="cmd-desc">снять ник</span></div>
+      <div class="cmd-card"><span class="cmd-name">/абан</span><span class="cmd-desc">снять ранги</span></div>
+      <div class="cmd-card"><span class="cmd-name">/ники</span><span class="cmd-desc">список ников</span></div>
+      <div class="cmd-card"><span class="cmd-name">/безники</span><span class="cmd-desc">без ников</span></div>
+    </div>
+
+    <div class="rank-header"><span class="rank-badge">3 — Старший модератор</span><h3>Управление сообщениями и ролями</h3></div>
+    <div class="commands-grid">
+      <div class="cmd-card"><span class="cmd-name">/разбан</span><span class="cmd-desc">разбан в беседе</span></div>
+      <div class="cmd-card"><span class="cmd-name">/сразбан</span><span class="cmd-desc">серверный разбан</span></div>
+      <div class="cmd-card"><span class="cmd-name">/clear · /mclear</span><span class="cmd-desc">очистка сообщений</span></div>
+      <div class="cmd-card"><span class="cmd-name">/очистка</span><span class="cmd-desc">удалить сообщения бота</span></div>
+      <div class="cmd-card"><span class="cmd-name">/закреп</span><span class="cmd-desc">закрепить сообщение</span></div>
+      <div class="cmd-card"><span class="cmd-name">/правила+</span><span class="cmd-desc">установить правила</span></div>
+      <div class="cmd-card"><span class="cmd-name">/правила-</span><span class="cmd-desc">сбросить правила</span></div>
+      <div class="cmd-card"><span class="cmd-name">/роль+</span><span class="cmd-desc">выдать роль</span></div>
+      <div class="cmd-card"><span class="cmd-name">/роль-</span><span class="cmd-desc">снять роль</span></div>
+      <div class="cmd-card"><span class="cmd-name">/роли</span><span class="cmd-desc">список ролей</span></div>
+      <div class="cmd-card"><span class="cmd-name">/рольинфо</span><span class="cmd-desc">инфо о роли</span></div>
+    </div>
+
+    <div class="rank-header"><span class="rank-badge">4 — Администратор</span><h3>Ранги и whitelist</h3></div>
+    <div class="commands-grid">
+      <div class="cmd-card"><span class="cmd-name">/ранг+</span><span class="cmd-desc">выдать серверный ранг</span></div>
+      <div class="cmd-card"><span class="cmd-name">/ранг-</span><span class="cmd-desc">снять серверный ранг</span></div>
+      <div class="cmd-card"><span class="cmd-name">/лок+</span><span class="cmd-desc">выдать локальный ранг</span></div>
+      <div class="cmd-card"><span class="cmd-name">/лок-</span><span class="cmd-desc">снять локальный ранг</span></div>
+      <div class="cmd-card"><span class="cmd-name">/вайтлист</span><span class="cmd-desc">список whitelist</span></div>
+      <div class="cmd-card"><span class="cmd-name">/вайтлист+</span><span class="cmd-desc">добавить в whitelist</span></div>
+      <div class="cmd-card"><span class="cmd-name">/вайтлист-</span><span class="cmd-desc">убрать из whitelist</span></div>
+    </div>
+  </section>
+
+  <!-- ========== РАЗДЕЛ: УПРАВЛЕНИЕ БЕСЕДОЙ ========== -->
+  <section id="tab-manage" class="section">
+    <div class="rank-header"><span class="rank-badge">5 — Старший администратор</span><h3>Объявления и настройки</h3></div>
+    <div class="commands-grid">
+      <div class="cmd-card"><span class="cmd-name">/объ</span><span class="cmd-desc">объявление в беседу</span></div>
+      <div class="cmd-card"><span class="cmd-name">/собы</span><span class="cmd-desc">объявление на сервер</span></div>
+      <div class="cmd-card"><span class="cmd-name">/репортканал</span><span class="cmd-desc">назначить канал репортов</span></div>
+      <div class="cmd-card"><span class="cmd-name">/репортканал-</span><span class="cmd-desc">снять канал репортов</span></div>
+      <div class="cmd-card"><span class="cmd-name">/логканал · /лог</span><span class="cmd-desc">канал логов</span></div>
+      <div class="cmd-card"><span class="cmd-name">/рольнастр</span><span class="cmd-desc">настройки роли</span></div>
+      <div class="cmd-card"><span class="cmd-name">/метка</span><span class="cmd-desc">метка беседы</span></div>
+      <div class="cmd-card"><span class="cmd-name">/настройки</span><span class="cmd-desc">настройки беседы</span></div>
+      <div class="cmd-card"><span class="cmd-name">/массувед</span><span class="cmd-desc">массувед в беседу</span></div>
+      <div class="cmd-card"><span class="cmd-name">/смассувед</span><span class="cmd-desc">массувед на сервер</span></div>
+    </div>
+
+    <div class="rank-header"><span class="rank-badge">6–7 — Руководство</span><h3>Глобальное управление</h3></div>
+    <div class="commands-grid">
+      <div class="cmd-card"><span class="cmd-name">/ккнопка</span><span class="cmd-desc">кнопка чата</span></div>
+      <div class="cmd-card"><span class="cmd-name">/ккнопка выкл</span><span class="cmd-desc">выключить кнопку</span></div>
+      <div class="cmd-card"><span class="cmd-name">/тишина</span><span class="cmd-desc">режим тишины</span></div>
+      <div class="cmd-card"><span class="cmd-name">/тишина выкл</span><span class="cmd-desc">снять тишину</span></div>
+      <div class="cmd-card"><span class="cmd-name">/привязать</span><span class="cmd-desc">привязать беседу к серверу</span></div>
+      <div class="cmd-card"><span class="cmd-name">/отвязать</span><span class="cmd-desc">отвязать беседу</span></div>
+      <div class="cmd-card"><span class="cmd-name">/сервера</span><span class="cmd-desc">список серверов</span></div>
+      <div class="cmd-card"><span class="cmd-name">/беседы</span><span class="cmd-desc">список бесед</span></div>
+      <div class="cmd-card"><span class="cmd-name">/гбан</span><span class="cmd-desc">глобальный бан (7+)</span></div>
+      <div class="cmd-card"><span class="cmd-name">/гразбан</span><span class="cmd-desc">снять глобальный бан (7+)</span></div>
+    </div>
+  </section>
+</div>
+
+<script>
+  (function() {
+    const tabs = document.querySelectorAll('.tab-btn');
+    const sections = document.querySelectorAll('.section');
+
+    function switchTab(tabId) {
+      // Скрываем все секции
+      sections.forEach(sec => sec.classList.remove('active'));
+      // Убираем active у всех кнопок
+      tabs.forEach(btn => btn.classList.remove('active'));
+
+      // Показываем нужную секцию
+      const targetSection = document.getElementById('tab-' + tabId);
+      if (targetSection) targetSection.classList.add('active');
+
+      // Подсвечиваем нажатую кнопку
+      const activeBtn = Array.from(tabs).find(btn => btn.dataset.tab === tabId);
+      if (activeBtn) activeBtn.classList.add('active');
+    }
+
+    tabs.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const tabId = btn.dataset.tab;
+        if (tabId) switchTab(tabId);
+      });
+    });
+
+    // По умолчанию открыта вкладка "Все команды"
+    switchTab('all');
+  })();
+</script>
+</body>
+  </html>
